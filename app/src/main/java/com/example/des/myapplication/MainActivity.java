@@ -12,22 +12,23 @@ import android.widget.LinearLayout;
 import android.widget.TextView;
 import android.widget.Toast;
 
-import java.util.HashMap;
-import java.util.Map;
+import baseEngine.DataProvider;
+import baseEngine.PickModel;
 
 
 public class MainActivity extends Activity implements View.OnClickListener {
 
     private TextView labelMain;
     private int counter = 0;
-    private Map<Integer,String> checkboxMap;
     private LinearLayout checkboxLayout;
+    private DataProvider dataProvider;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_main);
 
+        dataProvider = new DataProvider();
         InitLabel();
         InitCheckboxMap();
 
@@ -52,22 +53,17 @@ public class MainActivity extends Activity implements View.OnClickListener {
     }
 
     private void InitCheckboxMap(){
-        checkboxMap = new HashMap<Integer, String>();
-
-        checkboxMap.put(1, "Замок - Сорша");
-        checkboxMap.put(2, "Оплот - Ивор");
         checkboxLayout = (LinearLayout) findViewById(R.id.layoutForDraw);
         int wrapContent = LinearLayout.LayoutParams.WRAP_CONTENT;
         LinearLayout.LayoutParams lParams = new LinearLayout.LayoutParams(
                 wrapContent, wrapContent);
 
-        for(Map.Entry<Integer, String> entry : checkboxMap.entrySet()) {
-            int id = entry.getKey();
-            String text = entry.getValue();
+
+        for (PickModel model : dataProvider.GetModels()) {
 
             CheckBox cb = new CheckBox(this);
-            cb.setText(text);
-            cb.setId(id);
+            cb.setText(model.Name);
+            cb.setId(model.Id);
             checkboxLayout.addView(cb, lParams);
         }
 
