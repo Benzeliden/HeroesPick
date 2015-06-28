@@ -12,16 +12,23 @@ import android.widget.LinearLayout;
 import android.widget.TextView;
 import android.widget.Toast;
 
+import java.util.ArrayList;
+import java.util.Collection;
+import java.util.List;
+
 import baseEngine.DataProvider;
 import baseEngine.PickModel;
 
 
 public class MainActivity extends Activity implements View.OnClickListener {
 
+
     private TextView labelMain;
     private int counter = 0;
     private LinearLayout checkboxLayout;
     private DataProvider dataProvider;
+
+    private List<CheckBox> checkboxArray;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -58,20 +65,41 @@ public class MainActivity extends Activity implements View.OnClickListener {
         LinearLayout.LayoutParams lParams = new LinearLayout.LayoutParams(
                 wrapContent, wrapContent);
 
-
-        for (PickModel model : dataProvider.GetModels()) {
+        Collection<PickModel> models = dataProvider.GetModels();
+        checkboxArray = new ArrayList<CheckBox>();
+        for (PickModel model : models) {
 
             CheckBox cb = new CheckBox(this);
             cb.setText(model.Name);
             cb.setId(model.Id);
             checkboxLayout.addView(cb, lParams);
+            checkboxArray.add(cb);
         }
 
     }
 
     private void doGo(View v){
-        Toast.makeText(v.getContext(), "To be continued...", Toast.LENGTH_LONG).show();
+        //Toast.makeText(v.getContext(), "To be continued...", Toast.LENGTH_LONG).show();
 
+        List<Integer> listIds = new ArrayList<>();
+        for (CheckBox cbox : checkboxArray){
+            if (cbox.isChecked()){
+                listIds.add(cbox.getId());
+            }
+        }
+
+        PickModel picked = dataProvider.GetRandomName(listIds);
+        if (picked == null){
+            FragmentDialogResult dr = FragmentDialogResult.newInstance("Выберите хотя бы 1 героя!");
+            dr.show(getFragmentManager(), "blala");
+        }
+        else{
+            FragmentDialogResult dr = FragmentDialogResult.newInstance(picked.Name);
+            dr.show(getFragmentManager(), "blala");
+
+            CheckBox cb = (CheckBox)findViewById(picked.Id);
+            cb.setChecked(false);
+        }
     }
 
     @Override
@@ -113,4 +141,6 @@ public class MainActivity extends Activity implements View.OnClickListener {
 
         return super.onOptionsItemSelected(item);
     }
+
+
 }
