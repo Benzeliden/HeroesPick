@@ -2,6 +2,7 @@ package com.example.des.myapplication;
 
 import android.app.Activity;
 import android.os.Bundle;
+import android.os.Handler;
 import android.util.Log;
 import android.view.Menu;
 import android.view.MenuItem;
@@ -16,7 +17,7 @@ import java.util.ArrayList;
 import java.util.Collection;
 import java.util.List;
 
-import baseEngine.DataProvider;
+import baseEngine.HeroesPickerHelper;
 import baseEngine.PickModel;
 
 
@@ -26,37 +27,27 @@ public class MainActivity extends Activity implements View.OnClickListener {
     private TextView labelMain;
     private int counter = 0;
     private LinearLayout checkboxLayout;
-    private DataProvider dataProvider;
+    private HeroesPickerHelper pickerHelper;
+    private Boolean exit = false;
 
     private List<CheckBox> checkboxArray;
+    private Handler primaryHandler;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_main);
 
-        dataProvider = new DataProvider();
-        InitLabel();
+        primaryHandler = new Handler();
+
+        pickerHelper = new HeroesPickerHelper(this);
+
         InitCheckboxMap();
+        labelMain = (TextView)findViewById(R.id.labelTitle);
+        labelMain.setOnClickListener(this);
 
         Button btnGo = (Button) findViewById(R.id.btnGo);
         btnGo.setOnClickListener(this);
-    }
-
-    private void InitLabel() {
-        labelMain = (TextView)findViewById(R.id.labelTitle);
-        Activity current = this;
-        View.OnClickListener onCl = new View.OnClickListener() {
-            @Override
-            public void onClick(View v) {
-                counter++;
-                String info = "Clicked " + counter + " times";
-                labelMain.setText(info);
-                Toast.makeText(v.getContext(), info, Toast.LENGTH_SHORT).show();
-            }
-        };
-
-        labelMain.setOnClickListener(onCl);
     }
 
     private void InitCheckboxMap(){
@@ -65,7 +56,7 @@ public class MainActivity extends Activity implements View.OnClickListener {
         LinearLayout.LayoutParams lParams = new LinearLayout.LayoutParams(
                 wrapContent, wrapContent);
 
-        Collection<PickModel> models = dataProvider.GetModels();
+        Collection<PickModel> models = pickerHelper.GetModels();
         checkboxArray = new ArrayList<CheckBox>();
         for (PickModel model : models) {
 
@@ -79,7 +70,6 @@ public class MainActivity extends Activity implements View.OnClickListener {
     }
 
     private void doGo(View v){
-        //Toast.makeText(v.getContext(), "To be continued...", Toast.LENGTH_LONG).show();
 
         List<Integer> listIds = new ArrayList<>();
         for (CheckBox cbox : checkboxArray){
@@ -88,13 +78,12 @@ public class MainActivity extends Activity implements View.OnClickListener {
             }
         }
 
-        PickModel picked = dataProvider.GetRandomName(listIds);
+        PickModel picked = pickerHelper.GetRandomName(listIds);
         if (picked == null){
-            FragmentDialogResult dr = FragmentDialogResult.newInstance("Выберите хотя бы 1 героя!");
-            dr.show(getFragmentManager(), "blala");
+            Toast.makeText(v.getContext(), "Выберите хотя бы 1 героя!", Toast.LENGTH_SHORT).show();
         }
         else{
-            FragmentDialogResult dr = FragmentDialogResult.newInstance(picked.Name);
+            FragmentDialogResult dr = FragmentDialogResult.newInstance(picked.Name, "Выбран герой " + picked.Name + ", замок " + picked.CastleId);
             dr.show(getFragmentManager(), "blala");
 
             CheckBox cb = (CheckBox)findViewById(picked.Id);
@@ -107,6 +96,11 @@ public class MainActivity extends Activity implements View.OnClickListener {
         switch (v.getId()) {
             case R.id.btnGo:
                 doGo(v);
+                break;
+            case R.id.labelTitle:
+                counter++;
+                String info = "Clicked " + counter + " times";
+                labelMain.setText(info);
                 break;
         }
     }
@@ -142,5 +136,24 @@ public class MainActivity extends Activity implements View.OnClickListener {
         return super.onOptionsItemSelected(item);
     }
 
+    @Override
+    public void onBackPressed() {
+        if (exit) {
+            finish(); // finish activity
+            System.exit(0);
+        } else {
+            Toast.makeText(this, "Press Back again to Exit.",
+                    Toast.LENGTH_SHORT).show();
+            exit = true;
+            primaryHandler.postDelayed(new Runnable() {
+                @Override
+                public void run() {
+                    exit = false;
+                }
+            }, 3 * 1000);
+
+        }
+
+    }
 
 }

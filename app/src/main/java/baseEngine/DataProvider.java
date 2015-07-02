@@ -1,49 +1,43 @@
 package baseEngine;
 
-import android.util.Log;
+import android.content.Context;
+import android.database.Cursor;
+import android.database.sqlite.SQLiteDatabase;
 
+import java.util.ArrayList;
 import java.util.Collection;
-import java.util.HashMap;
-import java.util.List;
-import java.util.Map;
-import java.util.Random;
 
 public class DataProvider {
 
-    private Map<Integer,PickModel> heroesSet;
-    private Random random;
+    private Context context;
+    PickModelDbHelper dbHelper;
 
-    public DataProvider(){
-        this.heroesSet = new HashMap<Integer, PickModel>();
-        random = new Random();
-
-        heroesSet.put(1, new PickModel(1, 1, false, "Сорша"));
-        heroesSet.put(2, new PickModel(2, 2, false, "Ивор"));
+    public DataProvider(Context context) {
+        this.context = context;
+        dbHelper = new PickModelDbHelper(context);
     }
 
     public Collection<PickModel> GetModels() {
+        Collection<PickModel> collection = new ArrayList<>();
 
-        return heroesSet.values();
-    }
-
-    public String GetNameById(Integer id){
-         return heroesSet.get(id).Name;
-    }
-
-    //TODO refactor this!
-    public PickModel GetRandomName(List<Integer> ids){
-        int size = ids.size();
-        if (size == 0){
-           return null;
+        SQLiteDatabase db = dbHelper.getReadableDatabase();
+        Cursor c = db.query(HeroesTableConsts.TABLE_NAME, null, null, null, null, null, null);
+        if (c.moveToFirst()) {
+            int colIndexId = c.getColumnIndex(HeroesTableConsts.PRIMARY_KEY);
+            int nameColId = c.getColumnIndex(HeroesTableConsts.HERO_NAME);
+            int castleIdColId = c.getColumnIndex(HeroesTableConsts.HERO_CASTLE_ID);
+            do {
+                PickModel readedModel = new PickModel(
+                        c.getInt(colIndexId), c.getInt(castleIdColId), false, c.getString(nameColId)
+                );
+                collection.add(readedModel);
+            } while (c.moveToNext());
         }
-        int indx = random.nextInt(size);
-        Integer id = ids.get(indx);
-
-        if (!heroesSet.containsKey(id)){
-            Log.e("Engine", "Heroes set doesn`t contain id " + id.toString()) ;
-            return null;
-        }
-
-        return heroesSet.get(id);
+        c.close();
+        dbHelper.close();
+        //turn heroesSet.values();
+        return collection;
     }
 }
+
+
