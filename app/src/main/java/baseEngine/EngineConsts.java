@@ -6,7 +6,7 @@ class EngineConsts{
 
     public static String DATABASE_NAME = "HeroesDB";
 
-    public static int DATABASE_VERSION = 1;
+    public static int DATABASE_VERSION = 2;
 }
 
 class HeroesTableConsts{

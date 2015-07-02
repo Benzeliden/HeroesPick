@@ -53,7 +53,15 @@ class PickModelDbHelper extends SQLiteOpenHelper{
 
     @Override
     public void onUpgrade(SQLiteDatabase db, int oldVersion, int newVersion) {
-
+        Log.d(EngineConsts.LOG_TAG, "On update database");
+        if (oldVersion == 1){
+            String insertSql = String.format("insert into %s (%s, %s) values ('Ивор', 2)",
+                    HeroesTableConsts.TABLE_NAME,
+                    HeroesTableConsts.HERO_NAME,
+                    HeroesTableConsts.HERO_CASTLE_ID);
+            Log.d(EngineConsts.LOG_TAG, insertSql);
+            db.execSQL(insertSql);
+        }
     }
 }
 
