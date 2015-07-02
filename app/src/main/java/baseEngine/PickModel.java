@@ -43,7 +43,8 @@ class PickModelDbHelper extends SQLiteOpenHelper{
         Log.d(EngineConsts.LOG_TAG, heroTableSql);
         db.execSQL(heroTableSql);
 
-        String insertSql = String.format("insert into %s (%s, %s) values ('Сорша', 1)",
+        String insertSql = String.format("insert into %1$s (%2$s, %3$s) select 'Сорша', 1 " +
+                        "union all select 'Ивор', 2 ",
                 HeroesTableConsts.TABLE_NAME,
                 HeroesTableConsts.HERO_NAME,
                 HeroesTableConsts.HERO_CASTLE_ID);
@@ -53,15 +54,7 @@ class PickModelDbHelper extends SQLiteOpenHelper{
 
     @Override
     public void onUpgrade(SQLiteDatabase db, int oldVersion, int newVersion) {
-        Log.d(EngineConsts.LOG_TAG, "On update database");
-        if (oldVersion == 1){
-            String insertSql = String.format("insert into %s (%s, %s) values ('Ивор', 2)",
-                    HeroesTableConsts.TABLE_NAME,
-                    HeroesTableConsts.HERO_NAME,
-                    HeroesTableConsts.HERO_CASTLE_ID);
-            Log.d(EngineConsts.LOG_TAG, insertSql);
-            db.execSQL(insertSql);
-        }
+
     }
 }
 
