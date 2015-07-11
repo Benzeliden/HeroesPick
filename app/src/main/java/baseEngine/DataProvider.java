@@ -10,7 +10,7 @@ import java.util.Collection;
 public class DataProvider {
 
     private Context context;
-    PickModelDbHelper dbHelper;
+    private PickModelDbHelper dbHelper;
 
     public DataProvider(Context context) {
         this.context = context;
@@ -37,6 +37,13 @@ public class DataProvider {
         dbHelper.close();
         //turn heroesSet.values();
         return collection;
+    }
+
+
+    public void ResetDatabase(){
+        SQLiteDatabase db = dbHelper.getWritableDatabase();
+        dbHelper.ResetDB(db);
+        db.close();
     }
 }
 

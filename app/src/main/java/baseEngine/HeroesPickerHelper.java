@@ -14,9 +14,10 @@ public class HeroesPickerHelper{
     private Map<Integer,PickModel> heroesSet;
 
     private Random random;
+    private DataProvider dataProvider;
 
     public HeroesPickerHelper(Context context){
-        DataProvider dataProvider = new DataProvider(context);
+        dataProvider = new DataProvider(context);
         random = new Random();
         heroesSet = new HashMap<>();
         Init(dataProvider);
@@ -25,6 +26,7 @@ public class HeroesPickerHelper{
     //TODO: use adapter to init
     protected void Init(DataProvider dataProvider){
         Collection<PickModel> data = dataProvider.GetModels();
+        heroesSet.clear();
 
         for(PickModel pm: data){
             heroesSet.put(pm.Id, pm);
@@ -56,4 +58,8 @@ public class HeroesPickerHelper{
         return heroesSet.get(id);
     }
 
+    public void ResetDB() {
+        dataProvider.ResetDatabase();
+        Init(dataProvider);
+    }
 }

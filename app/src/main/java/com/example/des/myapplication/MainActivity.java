@@ -24,6 +24,8 @@ import baseEngine.PickModel;
 public class MainActivity extends Activity implements View.OnClickListener {
 
 
+    private String Log_tag = "app"  ;
+
     private TextView labelMain;
     private int counter = 0;
     private LinearLayout checkboxLayout;
@@ -52,6 +54,11 @@ public class MainActivity extends Activity implements View.OnClickListener {
 
     private void InitCheckboxMap(){
         checkboxLayout = (LinearLayout) findViewById(R.id.layoutForDraw);
+        if (checkboxArray != null && checkboxArray.size() > 0){
+            checkboxLayout.removeAllViews();
+            Log.d(Log_tag,"reinitialization");
+        }
+
         int wrapContent = LinearLayout.LayoutParams.WRAP_CONTENT;
         LinearLayout.LayoutParams lParams = new LinearLayout.LayoutParams(
                 wrapContent, wrapContent);
@@ -66,6 +73,7 @@ public class MainActivity extends Activity implements View.OnClickListener {
             checkboxLayout.addView(cb, lParams);
             checkboxArray.add(cb);
         }
+
 
     }
 
@@ -131,6 +139,19 @@ public class MainActivity extends Activity implements View.OnClickListener {
             Log.d("Settings clicked","Settings clicked in menu");
             Toast.makeText(this,"HELLO!", Toast.LENGTH_SHORT).show();
             return true;
+        }
+        switch (id){
+            case R.id.action_settings:
+
+                Log.d(Log_tag, "Settings clicked in menu");
+                Toast.makeText(this,"HELLO!", Toast.LENGTH_SHORT).show();
+                return true;
+            case R.id.action_resetDb:
+                Log.d(Log_tag, "ResetDB");
+                pickerHelper.ResetDB();
+
+                InitCheckboxMap();
+                return true;
         }
 
         return super.onOptionsItemSelected(item);
