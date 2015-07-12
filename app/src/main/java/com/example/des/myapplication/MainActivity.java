@@ -4,12 +4,13 @@ import android.app.Activity;
 import android.os.Bundle;
 import android.os.Handler;
 import android.util.Log;
+import android.util.SparseBooleanArray;
 import android.view.Menu;
 import android.view.MenuItem;
 import android.view.View;
+import android.widget.ArrayAdapter;
 import android.widget.Button;
-import android.widget.CheckBox;
-import android.widget.LinearLayout;
+import android.widget.ListView;
 import android.widget.TextView;
 import android.widget.Toast;
 
@@ -24,15 +25,13 @@ import baseEngine.PickModel;
 public class MainActivity extends Activity implements View.OnClickListener {
 
 
-    private String Log_tag = "app"  ;
+    private String Log_tag = "app";
 
     private TextView labelMain;
     private int counter = 0;
-    private LinearLayout checkboxLayout;
+    private ListView listView;
     private HeroesPickerHelper pickerHelper;
     private Boolean exit = false;
-
-    private List<CheckBox> checkboxArray;
     private Handler primaryHandler;
 
     @Override
@@ -44,58 +43,54 @@ public class MainActivity extends Activity implements View.OnClickListener {
 
         pickerHelper = new HeroesPickerHelper(this);
 
+
         InitCheckboxMap();
-        labelMain = (TextView)findViewById(R.id.labelTitle);
+        labelMain = (TextView) findViewById(R.id.labelTitle);
         labelMain.setOnClickListener(this);
 
         Button btnGo = (Button) findViewById(R.id.btnGo);
         btnGo.setOnClickListener(this);
     }
 
-    private void InitCheckboxMap(){
-        checkboxLayout = (LinearLayout) findViewById(R.id.layoutForDraw);
-        if (checkboxArray != null && checkboxArray.size() > 0){
-            checkboxLayout.removeAllViews();
-            Log.d(Log_tag,"reinitialization");
-        }
-
-        int wrapContent = LinearLayout.LayoutParams.WRAP_CONTENT;
-        LinearLayout.LayoutParams lParams = new LinearLayout.LayoutParams(
-                wrapContent, wrapContent);
-
+    private void InitCheckboxMap() {
         Collection<PickModel> models = pickerHelper.GetModels();
-        checkboxArray = new ArrayList<CheckBox>();
-        for (PickModel model : models) {
 
-            CheckBox cb = new CheckBox(this);
-            cb.setText(model.Name);
-            cb.setId(model.Id);
-            checkboxLayout.addView(cb, lParams);
-            checkboxArray.add(cb);
-        }
+        listView = (ListView) findViewById(R.id.mainListView);
+        listView.setChoiceMode(ListView.CHOICE_MODE_MULTIPLE);
+        ArrayAdapter<PickModel> adapter = new ArrayAdapter<>(this,
+                android.R.layout.simple_list_item_multiple_choice,
+                models.toArray(new PickModel[models.size()]));
 
+        listView.setAdapter(adapter);
 
     }
 
-    private void doGo(View v){
+    private void doGo(View v) {
+        List<Integer> itemIds = new ArrayList<>();
+        List<Integer> positions = new ArrayList<>();
 
-        List<Integer> listIds = new ArrayList<>();
-        for (CheckBox cbox : checkboxArray){
-            if (cbox.isChecked()){
-                listIds.add(cbox.getId());
+        SparseBooleanArray checkedItems = listView.getCheckedItemPositions();
+        for (int i = 0; i < checkedItems.size(); i++) {
+            if (checkedItems.valueAt(i)) {
+                int position = checkedItems.keyAt(i);
+                PickModel item = (PickModel)listView.getAdapter().getItem(position);
+
+                positions.add(position);
+                itemIds.add(item.Id);
             }
         }
 
-        PickModel picked = pickerHelper.GetRandomName(listIds);
-        if (picked == null){
-            Toast.makeText(v.getContext(), "Выберите хотя бы 1 героя!", Toast.LENGTH_SHORT).show();
+
+        if (positions.size() == 0){
+            Toast.makeText(v.getContext(), "Отметьте хотя бы 1 героя в списке!", Toast.LENGTH_SHORT).show();
         }
         else{
-            FragmentDialogResult dr = FragmentDialogResult.newInstance(picked.Name, "Выбран герой " + picked.Name + ", замок " + picked.CastleId);
-            dr.show(getFragmentManager(), "blala");
+            int pos = pickerHelper.GetRandomElement(positions);
+            listView.setItemChecked(pos, false);
+            PickModel picked = (PickModel)listView.getAdapter().getItem(pos);
 
-            CheckBox cb = (CheckBox)findViewById(picked.Id);
-            cb.setChecked(false);
+            FragmentDialogResult dr = FragmentDialogResult.newInstance(picked.Name, "Выбран герой " + picked.Name + ", замок " + picked.CastleName);
+            dr.show(getFragmentManager(), "blala");
         }
     }
 
@@ -122,7 +117,7 @@ public class MainActivity extends Activity implements View.OnClickListener {
     }
 
     @Override
-    public boolean onPrepareOptionsMenu(Menu menu){
+    public boolean onPrepareOptionsMenu(Menu menu) {
 
         return super.onPrepareOptionsMenu(menu);
     }
@@ -136,15 +131,15 @@ public class MainActivity extends Activity implements View.OnClickListener {
 
         //noinspection SimplifiableIfStatement
         if (id == R.id.action_settings) {
-            Log.d("Settings clicked","Settings clicked in menu");
-            Toast.makeText(this,"HELLO!", Toast.LENGTH_SHORT).show();
+            Log.d("Settings clicked", "Settings clicked in menu");
+            Toast.makeText(this, "HELLO!", Toast.LENGTH_SHORT).show();
             return true;
         }
-        switch (id){
+        switch (id) {
             case R.id.action_settings:
 
                 Log.d(Log_tag, "Settings clicked in menu");
-                Toast.makeText(this,"HELLO!", Toast.LENGTH_SHORT).show();
+                Toast.makeText(this, "HELLO!", Toast.LENGTH_SHORT).show();
                 return true;
             case R.id.action_resetDb:
                 Log.d(Log_tag, "ResetDB");

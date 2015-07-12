@@ -1,17 +1,18 @@
 package baseEngine;
 
 import android.content.Context;
-import android.util.Log;
 
+import java.util.ArrayList;
 import java.util.Collection;
-import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 import java.util.Random;
 
 public class HeroesPickerHelper{
 
-    private Map<Integer,PickModel> heroesSet;
+    private Collection<PickModel> heroesList;
+
+    private Map<Integer, CastlePickModel> set;
 
     private Random random;
     private DataProvider dataProvider;
@@ -19,43 +20,31 @@ public class HeroesPickerHelper{
     public HeroesPickerHelper(Context context){
         dataProvider = new DataProvider(context);
         random = new Random();
-        heroesSet = new HashMap<>();
+        heroesList = new ArrayList<>();
         Init(dataProvider);
     }
 
     //TODO: use adapter to init
     protected void Init(DataProvider dataProvider){
-        Collection<PickModel> data = dataProvider.GetModels();
-        heroesSet.clear();
+        heroesList = dataProvider.GetModels();
 
-        for(PickModel pm: data){
-            heroesSet.put(pm.Id, pm);
-        }
+        set = dataProvider.GetModelsGrouped();
     }
 
     public Collection<PickModel> GetModels() {
-        return heroesSet.values();
+        return heroesList;
     }
 
 
-    public String GetNameById(Integer id){
-        return heroesSet.get(id).Name;
-    }
-
-    public PickModel GetRandomName(List<Integer> ids){
-        int size = ids.size();
+    public Integer GetRandomElement(List<Integer> positions){
+        int size = positions.size();
         if (size == 0){
             return null;
         }
         int index = random.nextInt(size);
-        Integer id = ids.get(index);
+        Integer position = positions.get(index);
 
-        if (!heroesSet.containsKey(id)){
-            Log.e(EngineConsts.LOG_TAG, "Heroes set doesn`t contain id " + id.toString()) ;
-            return null;
-        }
-
-        return heroesSet.get(id);
+        return position;
     }
 
     public void ResetDB() {
