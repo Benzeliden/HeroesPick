@@ -33,8 +33,8 @@ public class DataProvider {
                 HeroesTableConsts.HERO_CASTLE_ID);
     }
 
-    public Collection<PickModel> GetModels() {
-        Collection<PickModel> collection = new ArrayList<>();
+    public Collection<HeroModel> GetModels() {
+        Collection<HeroModel> collection = new ArrayList<>();
 
         SQLiteDatabase db = dbHelper.getReadableDatabase();
         Cursor c = db.rawQuery(sqlSelect, null);
@@ -43,7 +43,7 @@ public class DataProvider {
             int nameColId = c.getColumnIndex("hName");
             int castleNameColId = c.getColumnIndex("cName");
             do {
-                PickModel readedModel = new PickModel(
+                HeroModel readedModel = new HeroModel(
                         c.getInt(colIndexId), c.getString(castleNameColId), false, c.getString(nameColId)
                 );
                 collection.add(readedModel);
@@ -55,8 +55,8 @@ public class DataProvider {
         return collection;
     }
 
-    public Map<Integer, CastlePickModel> GetModelsGrouped() {
-        Map<Integer, CastlePickModel> result = new HashMap<>();
+    public Map<Integer, CastleModel> GetModelsGrouped() {
+        Map<Integer, CastleModel> result = new HashMap<>();
 
 
         SQLiteDatabase db = dbHelper.getReadableDatabase();
@@ -70,25 +70,23 @@ public class DataProvider {
 
             do {
                 int castleId = castleCursor.getInt(castleIdCol);
-                String castleName =castleCursor.getString(castleNameCol);
+                String castleName = castleCursor.getString(castleNameCol);
                 if (!result.containsKey(castleId)) {
                     result.put(castleId,
-                            new CastlePickModel(castleId,
-                                    castleName,
-                                    true));
+                            new CastleModel(castleId, castleName));
                 }
 
-                CastlePickModel castle = result.get(castleId);
+                CastleModel castle = result.get(castleId);
 
 
-                PickModel heroModel = new PickModel(
+                HeroModel heroModel = new HeroModel(
                         castleCursor.getInt(heroIdCol),
                         castleName,
                         true,
                         castleCursor.getString(heroNameCol)
                 );
 
-                castle.AddHero(heroModel);
+                castle.addHero(heroModel);
 
             } while (castleCursor.moveToNext());
         }

@@ -1,18 +1,21 @@
-package baseEngine;
+package com.example.des.myapplication;
 
 import android.content.Context;
 
 import java.util.ArrayList;
 import java.util.Collection;
-import java.util.List;
 import java.util.Map;
 import java.util.Random;
 
+import baseEngine.CastleModel;
+import baseEngine.DataProvider;
+import baseEngine.HeroModel;
+
 public class HeroesPickerHelper{
 
-    private Collection<PickModel> heroesList;
+    private Collection<HeroModel> heroesList;
 
-    private Map<Integer, CastlePickModel> set;
+    private Map<Integer, CastleModel> set;
 
     private Random random;
     private DataProvider dataProvider;
@@ -31,24 +34,40 @@ public class HeroesPickerHelper{
         set = dataProvider.GetModelsGrouped();
     }
 
-    public Collection<PickModel> GetModels() {
+    public Collection<HeroModel> GetModels() {
         return heroesList;
     }
 
+    public Map<Integer, CastleModel> GetMap(){
+        return set;
+    }
 
-    public Integer GetRandomElement(List<Integer> positions){
-        int size = positions.size();
-        if (size == 0){
+
+    public HeroPickModel GetRandomPick(CustomExpandableAdapter adapter){
+        int c = adapter.getCheckedCount();
+        if (c == 0){
             return null;
         }
-        int index = random.nextInt(size);
-        Integer position = positions.get(index);
+        Finder f = new Finder(random.nextInt(c));
 
-        return position;
+        HeroPickModel result = adapter.getChecked(f);
+
+        return result;
     }
 
     public void ResetDB() {
         dataProvider.ResetDatabase();
         Init(dataProvider);
     }
+}
+
+class Finder{
+
+    public Finder(int count) {
+        counter = count;
+    }
+
+    public int counter;
+
+    public HeroPickModel result;
 }

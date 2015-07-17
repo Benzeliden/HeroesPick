@@ -1,8 +1,8 @@
 package baseEngine;
 
-public class PickModel {
+public class HeroModel {
 
-    PickModel(int id, String castleName, boolean checked, String Name) {
+    HeroModel(int id, String castleName, boolean checked, String Name) {
         this.Id = id;
         this.Checked = checked;
         this.Name = Name;

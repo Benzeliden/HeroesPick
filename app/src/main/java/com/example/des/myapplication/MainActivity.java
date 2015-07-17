@@ -4,22 +4,17 @@ import android.app.Activity;
 import android.os.Bundle;
 import android.os.Handler;
 import android.util.Log;
-import android.util.SparseBooleanArray;
 import android.view.Menu;
 import android.view.MenuItem;
 import android.view.View;
-import android.widget.ArrayAdapter;
 import android.widget.Button;
-import android.widget.ListView;
+import android.widget.ExpandableListView;
 import android.widget.TextView;
 import android.widget.Toast;
 
-import java.util.ArrayList;
-import java.util.Collection;
-import java.util.List;
+import java.util.Map;
 
-import baseEngine.HeroesPickerHelper;
-import baseEngine.PickModel;
+import baseEngine.CastleModel;
 
 
 public class MainActivity extends Activity implements View.OnClickListener {
@@ -29,7 +24,8 @@ public class MainActivity extends Activity implements View.OnClickListener {
 
     private TextView labelMain;
     private int counter = 0;
-    private ListView listView;
+    private ExpandableListView listView;
+    private CustomExpandableAdapter adapter;
     private HeroesPickerHelper pickerHelper;
     private Boolean exit = false;
     private Handler primaryHandler;
@@ -53,43 +49,23 @@ public class MainActivity extends Activity implements View.OnClickListener {
     }
 
     private void InitCheckboxMap() {
-        Collection<PickModel> models = pickerHelper.GetModels();
-
-        listView = (ListView) findViewById(R.id.mainListView);
-        listView.setChoiceMode(ListView.CHOICE_MODE_MULTIPLE);
-        ArrayAdapter<PickModel> adapter = new ArrayAdapter<>(this,
-                android.R.layout.simple_list_item_multiple_choice,
-                models.toArray(new PickModel[models.size()]));
-
+        Map<Integer, CastleModel> set = pickerHelper.GetMap();
+        adapter = new CustomExpandableAdapter(this, set);
+        listView = (ExpandableListView) findViewById(R.id.mainListView);
         listView.setAdapter(adapter);
-
+        listView.setOnChildClickListener(adapter);
+        //android.R.layout.simple_expandable_list_item_2
     }
 
     private void doGo(View v) {
-        List<Integer> itemIds = new ArrayList<>();
-        List<Integer> positions = new ArrayList<>();
+        //TODO: refactor this
+        HeroPickModel result = pickerHelper.GetRandomPick(adapter);
 
-        SparseBooleanArray checkedItems = listView.getCheckedItemPositions();
-        for (int i = 0; i < checkedItems.size(); i++) {
-            if (checkedItems.valueAt(i)) {
-                int position = checkedItems.keyAt(i);
-                PickModel item = (PickModel)listView.getAdapter().getItem(position);
-
-                positions.add(position);
-                itemIds.add(item.Id);
-            }
-        }
-
-
-        if (positions.size() == 0){
+        if (result == null) {
             Toast.makeText(v.getContext(), "Отметьте хотя бы 1 героя в списке!", Toast.LENGTH_SHORT).show();
-        }
-        else{
-            int pos = pickerHelper.GetRandomElement(positions);
-            listView.setItemChecked(pos, false);
-            PickModel picked = (PickModel)listView.getAdapter().getItem(pos);
-
-            FragmentDialogResult dr = FragmentDialogResult.newInstance(picked.Name, "Выбран герой " + picked.Name + ", замок " + picked.CastleName);
+        } else {
+            //TODO: clear after pick bugged
+            FragmentDialogResult dr = FragmentDialogResult.newInstance(result.name, String.format("Выбран герой %s, замок %s", result.name, result.castleName));
             dr.show(getFragmentManager(), "blala");
         }
     }

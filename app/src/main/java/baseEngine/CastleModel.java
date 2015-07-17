@@ -4,12 +4,11 @@ import java.util.Collection;
 import java.util.HashMap;
 import java.util.Map;
 
-public class CastlePickModel {
+public class CastleModel {
 
-    public CastlePickModel(int id, String name, boolean checked) {
+    public CastleModel(int id, String name) {
         Id = id;
         CastleName = name;
-        Checked = checked;
         HeroMap = new HashMap<>();
     }
 
@@ -17,15 +16,21 @@ public class CastlePickModel {
 
     public String CastleName;
 
-    public boolean Checked;
+    public Map<Integer, HeroModel> HeroMap;
 
-    public Map<Integer, PickModel> HeroMap;
-
-    public Collection<PickModel> GetHeroList(){
+    public Collection<HeroModel> getHeroList() {
         return HeroMap.values();
-    };
+    }
 
-    public void AddHero(PickModel hero){
+    public HeroModel getHero(int id) {
+        return HeroMap.get(id);
+    }
+
+    public int getHeroCount() {
+        return HeroMap.size();
+    }
+
+    public void addHero(HeroModel hero) {
         if (HeroMap.containsKey(hero.Id))
             return;
         HeroMap.put(hero.Id, hero);
