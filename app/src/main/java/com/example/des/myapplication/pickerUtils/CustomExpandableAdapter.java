@@ -1,4 +1,4 @@
-package com.example.des.myapplication;
+package com.example.des.myapplication.pickerUtils;
 
 import android.content.Context;
 import android.util.Log;
@@ -9,7 +9,13 @@ import android.widget.BaseExpandableListAdapter;
 import android.widget.CheckedTextView;
 import android.widget.ExpandableListView;
 
+import com.example.des.myapplication.AppConsts;
+import com.example.des.myapplication.R;
+
+import java.util.ArrayList;
+import java.util.List;
 import java.util.Map;
+import java.util.Random;
 
 import baseEngine.CastleModel;
 
@@ -18,6 +24,7 @@ public class CustomExpandableAdapter extends BaseExpandableListAdapter implement
     private Context myContext;
 
     private CastlePickModel[] set;
+    private List<HeroPickModel> allHeroModels;
     private int groupCount;
     private LayoutInflater inflater;
 
@@ -114,29 +121,43 @@ public class CustomExpandableAdapter extends BaseExpandableListAdapter implement
                 String.format("Custom adapter: onChildClick called. groupPosition = %d, childPosition = %d, id = %d",
                         groupPosition, childPosition, id));
         findChildModel(groupPosition, childPosition).toogle();
-        set[groupPosition].updateBindings();
+        //set[groupPosition].updateBindings();
+
+        this.notifyDataSetChanged();
 
         return false;
     }
 
-    public int getCheckedCount(){
-        int c = 0;
+    public GetRandomHeroResponce getChecked(Random random, PickMode pickMode) {
+        List<HeroPickModel> list = new ArrayList<HeroPickModel>();
+        GetRandomHeroResponce responce = new GetRandomHeroResponce();
 
-        for (CastlePickModel cm : set){
-            c += cm.getSelectedCount();
-        }
+        for (CastlePickModel castleModel : set) {
+            if (!castleModel.isChecked())
+                continue;
 
-        return c;
-    }
-
-    public HeroPickModel getChecked(Finder finder){
-
-        for (CastlePickModel cm : set){
-            finder = cm.getChecked(finder);
-            if (finder.result != null){
-                break;
+            for (HeroPickModel hModel : castleModel.heroes) {
+                if (!hModel.isChecked())
+                    continue;
+                list.add(hModel);
             }
         }
-        return finder.result;
+
+        int size = list.size();
+        if (size == 0) {
+            responce.result = GetRandomHeroErrorEnum.NO_CHECKED_FOUND;
+            return responce;
+        }
+        int pos = random.nextInt(size);
+
+        responce.result = GetRandomHeroErrorEnum.OK;
+        responce.heroPickModel = list.get(pos);
+
+        if (pickMode == PickMode.UNCHECK_PICKED) {
+            responce.heroPickModel.toogle();
+            this.notifyDataSetChanged();
+        }
+
+        return responce;
     }
 }

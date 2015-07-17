@@ -1,4 +1,4 @@
-package com.example.des.myapplication;
+package com.example.des.myapplication.pickerUtils;
 
 import android.widget.CheckedTextView;
 
@@ -12,14 +12,6 @@ public class HeroPickModel {
         castleName = source.CastleName;
         checked = true;
     }
-
-    private void updateBinding() {
-        if (bindedView != null) {
-            bindedView.setChecked(checked);
-        }
-    }
-
-    private CheckedTextView bindedView;
 
     private boolean checked;
 
@@ -35,18 +27,15 @@ public class HeroPickModel {
 
     public void setChecked(boolean val) {
         checked = val;
-        updateBinding();
     }
 
     public void toogle() {
-        checked = !checked;
-        updateBinding();
+        setChecked(!checked);
     }
 
     public void bind(CheckedTextView v) {
         v.setChecked(checked);
         v.setText(name);
-        bindedView = v;
     }
 
     @Override

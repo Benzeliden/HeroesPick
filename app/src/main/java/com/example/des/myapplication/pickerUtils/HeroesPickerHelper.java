@@ -1,4 +1,4 @@
-package com.example.des.myapplication;
+package com.example.des.myapplication.pickerUtils;
 
 import android.content.Context;
 
@@ -43,14 +43,8 @@ public class HeroesPickerHelper{
     }
 
 
-    public HeroPickModel GetRandomPick(CustomExpandableAdapter adapter){
-        int c = adapter.getCheckedCount();
-        if (c == 0){
-            return null;
-        }
-        Finder f = new Finder(random.nextInt(c));
-
-        HeroPickModel result = adapter.getChecked(f);
+    public GetRandomHeroResponce GetRandomPick(CustomExpandableAdapter adapter){
+        GetRandomHeroResponce result = adapter.getChecked(random, PickMode.UNCHECK_PICKED);
 
         return result;
     }
@@ -59,15 +53,4 @@ public class HeroesPickerHelper{
         dataProvider.ResetDatabase();
         Init(dataProvider);
     }
-}
-
-class Finder{
-
-    public Finder(int count) {
-        counter = count;
-    }
-
-    public int counter;
-
-    public HeroPickModel result;
 }

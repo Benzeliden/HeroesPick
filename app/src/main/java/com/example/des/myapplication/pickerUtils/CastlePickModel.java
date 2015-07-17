@@ -1,14 +1,14 @@
-package com.example.des.myapplication;
+package com.example.des.myapplication.pickerUtils;
 
 import android.view.View;
 import android.widget.TextView;
+
+import com.example.des.myapplication.R;
 
 import baseEngine.CastleModel;
 import baseEngine.HeroModel;
 
 public class CastlePickModel {
-
-    private View convertView;
 
     public CastlePickModel(CastleModel source) {
         this.id = source.Id;
@@ -19,22 +19,13 @@ public class CastlePickModel {
             heroes[counter] = new HeroPickModel(model);
             counter++;
         }
-
-    }
-
-    public void updateBindings() {
-        if (convertView == null) {
-            return;
-        }
-        TextView tvName = (TextView) convertView.findViewById(R.id.castleName);
-        tvName.setText(castleName);
-        TextView tvTitle = (TextView) convertView.findViewById(R.id.castleTitle);
-        tvTitle.setText(getTitle());
     }
 
     public void bind(View view) {
-        convertView = view;
-        updateBindings();
+        TextView tvName = (TextView) view.findViewById(R.id.castleName);
+        tvName.setText(castleName);
+        TextView tvTitle = (TextView) view.findViewById(R.id.castleTitle);
+        tvTitle.setText(getTitle());
     }
 
     public int id;
@@ -43,6 +34,11 @@ public class CastlePickModel {
 
     public String getTitle() {
         return String.format("Selected %d / %d", getSelectedCount(), count());
+    }
+
+    //TODO: uncheck castles
+    public boolean isChecked(){
+        return true;
     }
 
     public int getSelectedCount() {
@@ -63,21 +59,6 @@ public class CastlePickModel {
 
     public HeroPickModel get(int pos) {
         return heroes[pos];
-    }
-
-    public Finder getChecked(Finder finder) {
-        for (HeroPickModel heroe : heroes) {
-            if (heroe.isChecked()) {
-                if (finder.counter > 0) {
-                    finder.counter--;
-                } else {
-                    finder.result = heroe;
-                    heroe.toogle();
-                    break;
-                }
-            }
-        }
-        return finder;
     }
 
 }

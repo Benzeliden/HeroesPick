@@ -12,6 +12,11 @@ import android.widget.ExpandableListView;
 import android.widget.TextView;
 import android.widget.Toast;
 
+import com.example.des.myapplication.pickerUtils.CustomExpandableAdapter;
+import com.example.des.myapplication.pickerUtils.GetRandomHeroErrorEnum;
+import com.example.des.myapplication.pickerUtils.GetRandomHeroResponce;
+import com.example.des.myapplication.pickerUtils.HeroesPickerHelper;
+
 import java.util.Map;
 
 import baseEngine.CastleModel;
@@ -58,14 +63,13 @@ public class MainActivity extends Activity implements View.OnClickListener {
     }
 
     private void doGo(View v) {
-        //TODO: refactor this
-        HeroPickModel result = pickerHelper.GetRandomPick(adapter);
+        GetRandomHeroResponce pick = pickerHelper.GetRandomPick(adapter);
 
-        if (result == null) {
+        if (pick.result == GetRandomHeroErrorEnum.NO_CHECKED_FOUND) {
             Toast.makeText(v.getContext(), "Отметьте хотя бы 1 героя в списке!", Toast.LENGTH_SHORT).show();
         } else {
-            //TODO: clear after pick bugged
-            FragmentDialogResult dr = FragmentDialogResult.newInstance(result.name, String.format("Выбран герой %s, замок %s", result.name, result.castleName));
+            FragmentDialogResult dr = FragmentDialogResult.newInstance(pick.heroPickModel.name,
+                    String.format("Выбран герой %s, замок %s", pick.heroPickModel.name, pick.heroPickModel.castleName));
             dr.show(getFragmentManager(), "blala");
         }
     }
